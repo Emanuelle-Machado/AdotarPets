@@ -1,8 +1,12 @@
 package com.example.adotarpets;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,43 +16,36 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.adotarpets.models.Animal;
 import com.example.adotarpets.models.Cidade;
 import com.example.adotarpets.models.Raca;
+import com.example.adotarpets.services.AnimalIntentService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import javax.net.ssl.HttpsURLConnection;
 
 public class MainActivity extends AppCompatActivity {
 
-    EditText edBuscar;
     ListView listaAnimais;
-    Gson gson;
     private List<Animal> animais = new ArrayList<>();
     private AnimalAdapter adapter;
     private Spinner spFinalidade, spRaca, spCidade;
@@ -56,44 +53,48 @@ public class MainActivity extends AppCompatActivity {
     private List<Cidade> listaCidades = new ArrayList<>();
 
     public class AnimalAdapter extends ArrayAdapter<Animal> {
+        private final Context context;
+        private final List<Animal> animais;
 
         public AnimalAdapter(Context context, List<Animal> animais) {
             super(context, 0, animais);
+            this.context = context;
+            this.animais = animais;
         }
 
         @NonNull
         @Override
-        public View getView(int pos, @Nullable View convertView, @NonNull ViewGroup parent) {
+        public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+            Animal animal = animais.get(position);
+
             if (convertView == null) {
-                convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_animal, parent, false);
+                convertView = LayoutInflater.from(context).inflate(R.layout.item_animal, parent, false);
             }
 
-            Animal animal = getItem(pos);
+            TextView txtDescricao = convertView.findViewById(R.id.txtDescricao);
+            TextView txtCor = convertView.findViewById(R.id.txtCor);
+            TextView txtIdade = convertView.findViewById(R.id.txtIdade);
+            TextView txtRaca = convertView.findViewById(R.id.txtRaca);
+            TextView txtTipo = convertView.findViewById(R.id.txtTipo);
+            TextView txtCidade = convertView.findViewById(R.id.txtCidade);
+            TextView txtContato = convertView.findViewById(R.id.txtContato);
+            TextView txtFinalidade = convertView.findViewById(R.id.txtFinalidade);
+            TextView txtValor = convertView.findViewById(R.id.txtValor);
 
-            TextView tvDescricao = convertView.findViewById(R.id.txtDescricao);
-            TextView tvCor = convertView.findViewById(R.id.txtCor);
-            TextView tvIdade = convertView.findViewById(R.id.txtIdade);
-            TextView tvRaca = convertView.findViewById(R.id.txtRacaTipo);
-            TextView tvCidade = convertView.findViewById(R.id.txtCidade);
-            TextView tvContato = convertView.findViewById(R.id.txtContato);
-
-            tvDescricao.setText("Descrição: " + animal.getDescricao());
-            tvCor.setText("Cor: " + animal.getCor());
-            tvIdade.setText("Idade: " + animal.getIdade() + " meses");
-
-            if (animal.getRaca() != null) {
-                tvRaca.setText("Raça: " + animal.getRaca().getDescricao());
-            }
-
-            if (animal.getCidade() != null) {
-                tvCidade.setText("Cidade: " + animal.getCidade().getNome());
-            }
-
-            tvContato.setText("Contato: " + animal.getContato());
+            txtDescricao.setText("Descrição: " + animal.getDescricao());
+            txtCor.setText("Cor: " + animal.getCor());
+            txtIdade.setText("Idade: " + animal.getIdade() + " meses");
+            txtRaca.setText("Raça: " + animal.getRaca().getDescricao());
+            txtTipo.setText("Tipo: " + animal.getRaca().getTipo().getDescricao());
+            txtCidade.setText("Cidade: " + animal.getCidade().getNome());
+            txtContato.setText("Contato: " + animal.getContato());
+            txtFinalidade.setText("Finalidade: " + (animal.getFinalidade().equals("D") ? "Doação" : "Adoção"));
+            txtValor.setText("Valor: R$ " + animal.getValor());
 
             return convertView;
         }
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,11 +106,24 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        listaAnimais = findViewById(R.id.lista_animais);
-        listaAnimais.setAdapter(adapter);
-        GsonBuilder bld = new GsonBuilder();
-        gson = bld.create();
+        if (!isInternetAvailable()) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Sem Conexão")
+                    .setMessage("O aplicativo não pode ser usado offline. Verifique sua conexão com a internet.")
+                    .setCancelable(false)
+                    .setPositiveButton("Fechar", (dialog, which) -> finish())
+                    .show();
+        }
 
+        listaAnimais = findViewById(R.id.lista_animais);
+        if (adapter == null) {
+            adapter = new AnimalAdapter(MainActivity.this, animais);
+            listaAnimais.setAdapter(adapter);
+        } else {
+            adapter.clear();
+            adapter.addAll(animais);
+            adapter.notifyDataSetChanged();
+        }
         spFinalidade = findViewById(R.id.spFinalidade);
         spRaca = findViewById(R.id.spRaca);
         spCidade = findViewById(R.id.spCidade);
@@ -124,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
         carregarCidades();
 
         Button btnBuscar = findViewById(R.id.btnBuscar);
+        Button btnLimpar = findViewById(R.id.btnLimpar);
         EditText edIdadeDe = findViewById(R.id.edIdadeDe);
         EditText edIdadeAte = findViewById(R.id.edIdadeAte);
         EditText edDDD = findViewById(R.id.edDDD);
@@ -164,65 +179,58 @@ public class MainActivity extends AppCompatActivity {
                 url += "idRaca=" + raca.getId() + "&";
             }
 
-            buscarAnimais(url, listaAnimais);
+            Intent intent = new Intent(this, AnimalIntentService.class);
+            intent.setAction(AnimalIntentService.ACTION_BUSCAR_ANIMAIS);
+            intent.putExtra("url", url);
+            startService(intent);
+        });
+
+        btnLimpar.setOnClickListener(v -> {
+            edIdadeDe.setText("");
+            edIdadeAte.setText("");
+            edDDD.setText("");
+            spFinalidade.setSelection(0); // "Todas"
+            spRaca.setSelection(0);       // "Todas"
+            spCidade.setSelection(0);     // "Todas"
         });
     }
 
-    private void buscarAnimais(String urlStr, ListView listaAnimais) {
-        new Thread(() -> {
-            try {
-                URL url = new URL(urlStr);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("GET");
-
-                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                StringBuilder json = new StringBuilder();
-                String linha;
-                while ((linha = reader.readLine()) != null) {
-                    json.append(linha);
-                }
-
-                Type tipoLista = new TypeToken<List<Animal>>() {}.getType();
-                List<Animal> animais = new Gson().fromJson(json.toString(), tipoLista);
-
-                runOnUiThread(() -> {
-                    AnimalAdapter adapter = new AnimalAdapter(this, animais);
-                    listaAnimais.setAdapter(adapter);
-                });
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                runOnUiThread(() -> Toast.makeText(this, "Erro ao buscar animais", Toast.LENGTH_SHORT).show());
-            }
-        }).start();
+    private boolean isInternetAvailable() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm != null) {
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+            return activeNetwork != null && activeNetwork.isConnected();
+        }
+        return false;
     }
 
 
-    public void cadastrarAnimal(Animal animal) {
-        new Thread(() -> {
-            try {
-                URL url = new URL("http://argo.td.utfpr.edu.br/pets/ws/animal");
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("POST");
-                conn.setRequestProperty("Content-Type", "application/json");
-                conn.setDoOutput(true);
+    private final BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (AnimalIntentService.ACTION_BUSCAR_ANIMAIS.equals(intent.getAction())) {
+                String json = intent.getStringExtra(AnimalIntentService.EXTRA_RESULTADO);
 
-                String json = new Gson().toJson(animal);
+                Type tipoLista = new TypeToken<List<Animal>>() {}.getType();
+                List<Animal> animais = new Gson().fromJson(json, tipoLista);
 
-                try (OutputStream os = conn.getOutputStream()) {
-                    os.write(json.getBytes());
-                }
-
-                if (conn.getResponseCode() == 200 || conn.getResponseCode() == 201) {
-                    Log.d("POST", "Animal cadastrado com sucesso!");
-                } else {
-                    Log.e("POST", "Erro ao cadastrar animal: " + conn.getResponseCode());
-                }
-
-            } catch (Exception e) {
-                Log.e("POST", "Erro: " + e.getMessage());
+                adapter = new AnimalAdapter(MainActivity.this, animais);
+                listaAnimais.setAdapter(adapter);
             }
-        }).start();
+        }
+    };
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        LocalBroadcastManager.getInstance(this)
+                .registerReceiver(receiver, new IntentFilter(AnimalIntentService.ACTION_BUSCAR_ANIMAIS));
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
     }
 
     private void carregarRacas() {

@@ -1,4 +1,14 @@
+package com.example.adotarpets.services;
+
+import android.app.IntentService;
 import android.content.Intent;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class AnimalIntentService extends IntentService {
 
