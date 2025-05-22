@@ -204,7 +204,6 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
