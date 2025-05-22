@@ -1,0 +1,87 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    android:background="#EEEEEE"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="start"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txtDescricao"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Descrição"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtRacaTipo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Raça/Tipo" />
+
+            <TextView
+                android:id="@+id/txtCor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Cor" />
+
+            <TextView
+                android:id="@+id/txtIdade"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Idade" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txtFinalidade"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:text="Finalidade" />
+
+            <TextView
+                android:id="@+id/txtProprietario"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:text="Proprietário" />
+
+            <TextView
+                android:id="@+id/txtContato"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:text="Contato" />
+
+            <TextView
+                android:id="@+id/txtCidade"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:text="Cidade" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
