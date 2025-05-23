@@ -29,7 +29,7 @@
                 android:id="@+id/txtTipo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Raça/Tipo" />
+                android:text="Tipo" />
 
             <TextView
                 android:id="@+id/txtRaca"

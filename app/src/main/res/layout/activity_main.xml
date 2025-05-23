@@ -73,6 +73,19 @@
                 android:layout_marginEnd="8dp"/>
 
             <Spinner
+                android:id="@+id/spCidade"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Spinner
                 android:id="@+id/spRaca"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -80,10 +93,12 @@
                 android:layout_marginEnd="8dp"/>
 
             <Spinner
-                android:id="@+id/spCidade"
+                android:id="@+id/spTipo"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"/>
+
         </LinearLayout>
 
         <LinearLayout
@@ -111,7 +126,23 @@
 
     <ListView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:id="@+id/lista_animais"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_cadastrar_animais"
+            android:text="Cadastrar Animais" />
+
+
+    </LinearLayout>
 
 </LinearLayout>

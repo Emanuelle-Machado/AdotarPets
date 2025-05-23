@@ -1,39 +1,31 @@
 package com.example.adotarpets;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
+import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.example.adotarpets.models.Animal;
 import com.example.adotarpets.models.Cidade;
 import com.example.adotarpets.models.Raca;
 import com.example.adotarpets.models.Tipo;
 import com.example.adotarpets.services.AnimalIntentService;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -44,210 +36,112 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class CadastrarAnimais extends AppCompatActivity {
 
-    ListView listaAnimais;
-    private List<Animal> animais = new ArrayList<>();
-    private AnimalAdapter adapter;
-    private Spinner spFinalidade, spRaca, spCidade, spTipo;
+    private EditText editDescricao, editIdade, editValor;
+    private Spinner spinnerTipo, spinnerRaca, spinnerCidade, spinnerFinalidade;
+    private Button btnCadastrar;
     private List<Raca> listaRacas = new ArrayList<>();
     private List<Cidade> listaCidades = new ArrayList<>();
     private List<Tipo> listaTipos = new ArrayList<>();
 
-    public class AnimalAdapter extends ArrayAdapter<Animal> {
-        private final Context context;
-        private final List<Animal> animais;
-
-        public AnimalAdapter(Context context, List<Animal> animais) {
-            super(context, 0, animais);
-            this.context = context;
-            this.animais = animais;
-        }
-
-        @NonNull
-        @Override
-        public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-            Animal animal = animais.get(position);
-
-            if (convertView == null) {
-                convertView = LayoutInflater.from(context).inflate(R.layout.item_animal, parent, false);
-            }
-
-            TextView txtDescricao = convertView.findViewById(R.id.txtDescricao);
-            TextView txtCor = convertView.findViewById(R.id.txtCor);
-            TextView txtIdade = convertView.findViewById(R.id.txtIdade);
-            TextView txtRaca = convertView.findViewById(R.id.txtRaca);
-            TextView txtTipo = convertView.findViewById(R.id.txtTipo);
-            TextView txtCidade = convertView.findViewById(R.id.txtCidade);
-            TextView txtContato = convertView.findViewById(R.id.txtContato);
-            TextView txtFinalidade = convertView.findViewById(R.id.txtFinalidade);
-            TextView txtValor = convertView.findViewById(R.id.txtValor);
-
-            txtDescricao.setText("Descrição: " + animal.getDescricao());
-            txtCor.setText("Cor: " + animal.getCor());
-            txtIdade.setText("Idade: " + animal.getIdade() + " meses");
-            txtRaca.setText("Raça: " + animal.getRaca().getDescricao());
-            txtTipo.setText("Tipo: " + animal.getRaca().getTipo().getDescricao());
-            txtCidade.setText("Cidade: " + animal.getCidade().getNome());
-            txtContato.setText("Contato: " + animal.getContato());
-            txtFinalidade.setText("Finalidade: " + (animal.getFinalidade().equals("D") ? "Doação" : "Adoção"));
-            txtValor.setText("Valor: R$ " + animal.getValor());
-
-            return convertView;
-        }
-    }
-
-
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_cadastrar_animais);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        if (!isInternetAvailable()) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Sem Conexão")
-                    .setMessage("O aplicativo não pode ser usado offline. Verifique sua conexão com a internet.")
-                    .setCancelable(false)
-                    .setPositiveButton("Fechar", (dialog, which) -> finish())
-                    .show();
-        }
-
-        listaAnimais = findViewById(R.id.lista_animais);
-        if (adapter == null) {
-            adapter = new AnimalAdapter(MainActivity.this, animais);
-            listaAnimais.setAdapter(adapter);
-        } else {
-            adapter.clear();
-            adapter.addAll(animais);
-            adapter.notifyDataSetChanged();
-        }
-        spFinalidade = findViewById(R.id.spFinalidade);
-        spTipo = findViewById(R.id.spTipo);
-        spRaca = findViewById(R.id.spRaca);
-        spCidade = findViewById(R.id.spCidade);
-
-        // Finalidade: Adoção ou Doação
-        List<String> finalidades = Arrays.asList("Finalidade", "Adoção", "Doação");
-        ArrayAdapter<String> finalidadeAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, finalidades);
-        spFinalidade.setAdapter(finalidadeAdapter);
 
         carregarTipos();
         carregarRacas();
         carregarCidades();
 
-        Button btnBuscar = findViewById(R.id.btnBuscar);
-        Button btnLimpar = findViewById(R.id.btnLimpar);
-        Button btn_cadastrar_animais = findViewById(R.id.btn_cadastrar_animais);
-        EditText edIdadeDe = findViewById(R.id.edIdadeDe);
-        EditText edIdadeAte = findViewById(R.id.edIdadeAte);
-        EditText edDDD = findViewById(R.id.edDDD);
+        editDescricao = findViewById(R.id.editTextDescricao);
+        editIdade = findViewById(R.id.editTextIdade);
+        editValor = findViewById(R.id.editTextValor);
+        spinnerTipo = findViewById(R.id.spinnerTipo);
+        spinnerRaca = findViewById(R.id.spinnerRaca);
+        spinnerCidade = findViewById(R.id.spinnerCidade);
+        spinnerFinalidade = findViewById(R.id.spinnerFinalidade);
+        btnCadastrar = findViewById(R.id.btn_salvar);
+        // Finalidade: Adoção ou Doação
+        List<String> finalidades = Arrays.asList("Finalidade", "Adoção", "Doação");
+        ArrayAdapter<String> finalidadeAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, finalidades);
+        spinnerFinalidade.setAdapter(finalidadeAdapter);
 
-        btnBuscar.setOnClickListener(v -> {
-            String url = "http://argo.td.utfpr.edu.br/pets/ws/animal?";
+        btnCadastrar.setOnClickListener(view -> cadastrarAnimal());
+    }
 
-            // Finalidade
-            String finalidadeSelecionada = spFinalidade.getSelectedItem().toString();
-            if (finalidadeSelecionada.equals("Adoção")) {
-                url += "finalidade=D&";
-            } else if (finalidadeSelecionada.equals("Doação")) {
-                url += "finalidade=A&";
+    private void cadastrarAnimal() {
+        try {
+            // Validate inputs
+            String descricao = editDescricao.getText().toString().trim();
+            if (descricao.isEmpty()) {
+                Toast.makeText(this, "Descrição é obrigatória", Toast.LENGTH_SHORT).show();
+                return;
             }
 
-            // Idade
-            if (!edIdadeDe.getText().toString().trim().isEmpty()) {
-                url += "idadeDe=" + edIdadeDe.getText().toString().trim() + "&";
-            }
-            if (!edIdadeAte.getText().toString().trim().isEmpty()) {
-                url += "idadeAte=" + edIdadeAte.getText().toString().trim() + "&";
+            String idadeStr = editIdade.getText().toString().trim();
+            if (idadeStr.isEmpty()) {
+                Toast.makeText(this, "Idade é obrigatória", Toast.LENGTH_SHORT).show();
+                return;
             }
 
-            // DDD
-            if (!edDDD.getText().toString().trim().isEmpty()) {
-                url += "ddd=" + edDDD.getText().toString().trim() + "&";
+            // Validate spinners
+            Tipo selectedTipo = (Tipo) spinnerTipo.getSelectedItem();
+            if (selectedTipo == null) {
+                Toast.makeText(this, "Selecione um tipo válido", Toast.LENGTH_SHORT).show();
+                return;
             }
 
-            // Cidade
-            Cidade cidade = (Cidade) spCidade.getSelectedItem();
-            if (cidade != null) {
-                url += "idCidade=" + cidade.getId() + "&";
+            Raca selectedRaca = (Raca) spinnerRaca.getSelectedItem();
+            if (selectedRaca == null) {
+                Toast.makeText(this, "Selecione uma raça válida", Toast.LENGTH_SHORT).show();
+                return;
             }
 
-            // Raça
-            Raca raca = (Raca) spRaca.getSelectedItem();
-            if (raca != null) {
-                url += "idRaca=" + raca.getId() + "&";
+            Cidade selectedCidade = (Cidade) spinnerCidade.getSelectedItem();
+            if (selectedCidade == null) {
+                Toast.makeText(this, "Selecione uma cidade válida", Toast.LENGTH_SHORT).show();
+                return;
             }
 
-            // Tipo
-            Tipo tipo = (Tipo) spTipo.getSelectedItem();
-            if (tipo != null) {
-                url += "idTipo=" + tipo.getId() + "&";
+            JSONObject json = new JSONObject();
+            json.put("descricao", descricao);
+            json.put("idade", Integer.parseInt(idadeStr));
+            json.put("finalidade", spinnerFinalidade.getSelectedItem().toString());
+
+            String valor = editValor.getText().toString().trim();
+            if (!valor.isEmpty()) {
+                json.put("valor", Double.parseDouble(valor));
             }
+
+            // Use actual IDs from objects (assuming Tipo, Raca, Cidade have getId() methods)
+            json.put("idTipo", selectedTipo.getId());
+            json.put("idRaca", selectedRaca.getId());
+            json.put("idCidade", selectedCidade.getId());
 
             Intent intent = new Intent(this, AnimalIntentService.class);
-            intent.setAction(AnimalIntentService.ACTION_BUSCAR_ANIMAIS);
-            intent.putExtra("url", url);
+            intent.setAction(AnimalIntentService.ACTION_CADASTRAR_ANIMAL);
+            intent.putExtra("json", json.toString());
             startService(intent);
-        });
 
-        btnLimpar.setOnClickListener(v -> {
-            edIdadeDe.setText("");
-            edIdadeAte.setText("");
-            edDDD.setText("");
-            spFinalidade.setSelection(0); // "Todas"
-            spRaca.setSelection(0);       // "Todas"
-            spCidade.setSelection(0);     // "Todas"
-            spTipo.setSelection(0);       // "Todas"
-        });
+            Toast.makeText(this, "Cadastro enviado!", Toast.LENGTH_SHORT).show();
+            finish(); // Volta pra tela inicial
 
-        btn_cadastrar_animais.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, CadastrarAnimais.class);
-            startActivity(intent);
-        });
-
-    }
-
-    private boolean isInternetAvailable() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (cm != null) {
-            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-            return activeNetwork != null && activeNetwork.isConnected();
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Idade ou valor inválido", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        } catch (Exception e) {
+            Toast.makeText(this, "Erro ao cadastrar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
         }
-        return false;
-    }
-
-    private final BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (AnimalIntentService.ACTION_BUSCAR_ANIMAIS.equals(intent.getAction())) {
-                String json = intent.getStringExtra(AnimalIntentService.EXTRA_RESULTADO);
-
-                Type tipoLista = new TypeToken<List<Animal>>() {}.getType();
-                List<Animal> animais = new Gson().fromJson(json, tipoLista);
-
-                adapter = new AnimalAdapter(MainActivity.this, animais);
-                listaAnimais.setAdapter(adapter);
-            }
-        }
-    };
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        LocalBroadcastManager.getInstance(this)
-                .registerReceiver(receiver, new IntentFilter(AnimalIntentService.ACTION_BUSCAR_ANIMAIS));
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
     }
 
     private void carregarTipos() {
@@ -294,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     };
                     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spTipo.setAdapter(adapter);
+                    spinnerTipo.setAdapter(adapter);
                 });
 
             } catch (Exception e) {
@@ -347,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     };
                     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spRaca.setAdapter(adapter);
+                    spinnerRaca.setAdapter(adapter);
                 });
 
             } catch (Exception e) {
@@ -400,7 +294,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     };
                     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spCidade.setAdapter(adapter);
+                    spinnerCidade.setAdapter(adapter);
                 });
 
             } catch (Exception e) {

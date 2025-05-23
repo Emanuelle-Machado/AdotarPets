@@ -2,7 +2,7 @@ package com.example.adotarpets.services;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.util.Log;
+import android.content.Context;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -11,20 +11,18 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class AnimalIntentService extends IntentService {
+public class RacaIntentService extends IntentService {
 
-    public static final String ACTION_BUSCAR_ANIMAIS = "BUSCAR_ANIMAIS";
-    public static final String ACTION_CADASTRAR_ANIMAL = "CADASTRAR_ANIMAL";
+    public static final String ACTION_BUSCAR_RACA = "ACTION_BUSCAR_RACA";
     public static final String EXTRA_RESULTADO = "resultado";
 
-    public AnimalIntentService() {
-        super("AnimalIntentService");
+    public RacaIntentService() {
+        super("RacaIntentService");
     }
 
-    @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
-            if (ACTION_BUSCAR_ANIMAIS.equals(intent.getAction())) {
+            if (ACTION_BUSCAR_RACA.equals(intent.getAction())) {
                 String urlStr = intent.getStringExtra("url");
 
                 try {
@@ -39,26 +37,9 @@ public class AnimalIntentService extends IntentService {
                         json.append(linha);
                     }
 
-                    Intent broadcastIntent = new Intent(ACTION_BUSCAR_ANIMAIS);
+                    Intent broadcastIntent = new Intent(ACTION_BUSCAR_RACA);
                     broadcastIntent.putExtra(EXTRA_RESULTADO, json.toString());
                     LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }else if (ACTION_CADASTRAR_ANIMAL.equals(intent.getAction())) {
-                String jsonStr = intent.getStringExtra("json");
-
-                try {
-                    URL url = new URL("http://argo.td.utfpr.edu.br/pets/ws/animal");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setRequestMethod("POST");
-                    conn.setDoOutput(true);
-                    conn.setRequestProperty("Content-Type", "application/json");
-
-                    conn.getOutputStream().write(jsonStr.getBytes("UTF-8"));
-                    int responseCode = conn.getResponseCode();
-                    Log.d("CADASTRO", "POST animal -> " + responseCode);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -66,4 +47,5 @@ public class AnimalIntentService extends IntentService {
             }
         }
     }
+
 }
