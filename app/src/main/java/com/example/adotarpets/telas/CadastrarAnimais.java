@@ -28,16 +28,15 @@ import com.example.adotarpets.models.Cidade;
 import com.example.adotarpets.models.Raca;
 import com.example.adotarpets.models.Tipo;
 import com.example.adotarpets.services.AnimalIntentService;
+import com.example.adotarpets.services.CidadeIntentService;
+import com.example.adotarpets.services.RacaIntentService;
+import com.example.adotarpets.services.TipoIntentService;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.lang.reflect.Type;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -51,6 +50,9 @@ public class CadastrarAnimais extends AppCompatActivity {
     private List<Cidade> listaCidades = new ArrayList<>();
     private List<Tipo> listaTipos = new ArrayList<>();
     private Animal animalParaEditar;
+    private boolean cidadesCarregadas = false;
+    private boolean tiposCarregados = false;
+    private boolean racasCarregadas = false;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -92,18 +94,21 @@ public class CadastrarAnimais extends AppCompatActivity {
             btnCadastrar.setText("Cadastrar");
         }
 
-        // Load data for spinners
+        // Load data for spinners using IntentServices
+        carregarCidades();
         carregarTipos();
         carregarRacas();
-        carregarCidades();
 
         // Set button listener
         btnCadastrar.setOnClickListener(view -> cadastrarAnimal());
 
-        // Register receiver for update results
+        // Register receiver for service results
         IntentFilter filter = new IntentFilter();
         filter.addAction(AnimalIntentService.ACTION_CADASTRAR_ANIMAL);
         filter.addAction(AnimalIntentService.ACTION_EDITAR_ANIMAL);
+        filter.addAction(CidadeIntentService.ACTION_BUSCAR_CIDADES);
+        filter.addAction(TipoIntentService.ACTION_BUSCAR_TIPOS);
+        filter.addAction(RacaIntentService.ACTION_BUSCAR_RACAS);
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, filter);
     }
 
@@ -337,11 +342,31 @@ public class CadastrarAnimais extends AppCompatActivity {
         }
     }
 
+    private void carregarCidades() {
+        Intent intent = new Intent(this, CidadeIntentService.class);
+        intent.setAction(CidadeIntentService.ACTION_BUSCAR_CIDADES);
+        startService(intent);
+    }
+
+    private void carregarTipos() {
+        Intent intent = new Intent(this, TipoIntentService.class);
+        intent.setAction(TipoIntentService.ACTION_BUSCAR_TIPOS);
+        startService(intent);
+    }
+
+    private void carregarRacas() {
+        Intent intent = new Intent(this, RacaIntentService.class);
+        intent.setAction(RacaIntentService.ACTION_BUSCAR_RACAS);
+        startService(intent);
+    }
+
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
             boolean success = intent.getBooleanExtra(AnimalIntentService.EXTRA_SUCCESS, false);
-            if (AnimalIntentService.ACTION_CADASTRAR_ANIMAL.equals(intent.getAction())) {
+
+            if (AnimalIntentService.ACTION_CADASTRAR_ANIMAL.equals(action)) {
                 if (success) {
                     Toast.makeText(CadastrarAnimais.this, "Cadastro enviado!", Toast.LENGTH_SHORT).show();
                     Intent resultIntent = new Intent();
@@ -351,7 +376,7 @@ public class CadastrarAnimais extends AppCompatActivity {
                     String error = intent.getStringExtra(AnimalIntentService.EXTRA_ERROR);
                     Toast.makeText(CadastrarAnimais.this, "Erro ao cadastrar: " + error, Toast.LENGTH_LONG).show();
                 }
-            } else if (AnimalIntentService.ACTION_EDITAR_ANIMAL.equals(intent.getAction())) {
+            } else if (AnimalIntentService.ACTION_EDITAR_ANIMAL.equals(action)) {
                 if (success) {
                     Toast.makeText(CadastrarAnimais.this, "Atualização enviada!", Toast.LENGTH_SHORT).show();
                     Intent resultIntent = new Intent();
@@ -361,147 +386,14 @@ public class CadastrarAnimais extends AppCompatActivity {
                     String error = intent.getStringExtra(AnimalIntentService.EXTRA_ERROR);
                     Toast.makeText(CadastrarAnimais.this, "Erro ao atualizar: " + error, Toast.LENGTH_LONG).show();
                 }
-            }
-        }
-    };
+            } else if (CidadeIntentService.ACTION_BUSCAR_CIDADES.equals(action)) {
+                if (success) {
+                    String json = intent.getStringExtra(CidadeIntentService.EXTRA_RESULTADO);
+                    Type tipoLista = new TypeToken<List<Cidade>>() {}.getType();
+                    listaCidades = new Gson().fromJson(json, tipoLista);
+                    listaCidades.add(0, null); // Para opção "Cidades"
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
-    }
-
-    private void carregarTipos() {
-        new Thread(() -> {
-            try {
-                URL url = new URL("http://argo.td.utfpr.edu.br/pets/ws/tipo");
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("GET");
-
-                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                StringBuilder json = new StringBuilder();
-                String linha;
-                while ((linha = reader.readLine()) != null) {
-                    json.append(linha);
-                }
-
-                Type tipoLista = new TypeToken<List<Tipo>>() {
-                }.getType();
-                listaTipos = new Gson().fromJson(json.toString(), tipoLista);
-                listaTipos.add(0, null); // Para opção "Tipos de Animais"
-
-                runOnUiThread(() -> {
-                    ArrayAdapter<Tipo> adapter = new ArrayAdapter<Tipo>(this,
-                            android.R.layout.simple_spinner_item, listaTipos) {
-                        @Override
-                        public View getView(int position, View convertView, ViewGroup parent) {
-                            TextView view = (TextView) super.getView(position, convertView, parent);
-                            if (getItem(position) == null) {
-                                view.setText("Tipos de Animais");
-                            } else {
-                                view.setText(getItem(position).getDescricao());
-                            }
-                            return view;
-                        }
-
-                        @Override
-                        public View getDropDownView(int position, View convertView, ViewGroup parent) {
-                            TextView view = (TextView) super.getDropDownView(position, convertView, parent);
-                            if (getItem(position) == null) {
-                                view.setText("Tipos de Animais");
-                            } else {
-                                view.setText(getItem(position).getDescricao());
-                            }
-                            return view;
-                        }
-                    };
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spinnerTipo.setAdapter(adapter);
-                    preencherCampos(); // Pre-fill fields after loading data
-                });
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
-    }
-
-    private void carregarRacas() {
-        new Thread(() -> {
-            try {
-                URL url = new URL("http://argo.td.utfpr.edu.br/pets/ws/raca");
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("GET");
-
-                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                StringBuilder json = new StringBuilder();
-                String linha;
-                while ((linha = reader.readLine()) != null) {
-                    json.append(linha);
-                }
-
-                Type racaLista = new TypeToken<List<Raca>>() {
-                }.getType();
-                listaRacas = new Gson().fromJson(json.toString(), racaLista);
-                listaRacas.add(0, null); // Para opção "Raças"
-
-                runOnUiThread(() -> {
-                    ArrayAdapter<Raca> adapter = new ArrayAdapter<Raca>(this,
-                            android.R.layout.simple_spinner_item, listaRacas) {
-                        @Override
-                        public View getView(int position, View convertView, ViewGroup parent) {
-                            TextView view = (TextView) super.getView(position, convertView, parent);
-                            if (getItem(position) == null) {
-                                view.setText("Raças");
-                            } else {
-                                view.setText(getItem(position).getDescricao());
-                            }
-                            return view;
-                        }
-
-                        @Override
-                        public View getDropDownView(int position, View convertView, ViewGroup parent) {
-                            TextView view = (TextView) super.getDropDownView(position, convertView, parent);
-                            if (getItem(position) == null) {
-                                view.setText("Raças");
-                            } else {
-                                view.setText(getItem(position).getDescricao());
-                            }
-                            return view;
-                        }
-                    };
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spinnerRaca.setAdapter(adapter);
-                    preencherCampos(); // Pre-fill fields after loading data
-                });
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
-    }
-
-    private void carregarCidades() {
-        new Thread(() -> {
-            try {
-                URL url = new URL("http://argo.td.utfpr.edu.br/pets/ws/cidade");
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("GET");
-
-                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                StringBuilder json = new StringBuilder();
-                String linha;
-                while ((linha = reader.readLine()) != null) {
-                    json.append(linha);
-                }
-
-                Type cidadeLista = new TypeToken<List<Cidade>>() {
-                }.getType();
-                listaCidades = new Gson().fromJson(json.toString(), cidadeLista);
-                listaCidades.add(0, null); // Para opção "Cidades"
-
-                runOnUiThread(() -> {
-                    ArrayAdapter<Cidade> adapter = new ArrayAdapter<Cidade>(this,
+                    ArrayAdapter<Cidade> adapter = new ArrayAdapter<Cidade>(CadastrarAnimais.this,
                             android.R.layout.simple_spinner_item, listaCidades) {
                         @Override
                         public View getView(int position, View convertView, ViewGroup parent) {
@@ -527,12 +419,103 @@ public class CadastrarAnimais extends AppCompatActivity {
                     };
                     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                     spinnerCidade.setAdapter(adapter);
-                    preencherCampos(); // Pre-fill fields after loading data
-                });
+                    cidadesCarregadas = true;
+                    tryPreencherCampos();
+                } else {
+                    String error = intent.getStringExtra(CidadeIntentService.EXTRA_ERROR);
+                    Toast.makeText(CadastrarAnimais.this, "Erro ao buscar cidades: " + error, Toast.LENGTH_LONG).show();
+                }
+            } else if (TipoIntentService.ACTION_BUSCAR_TIPOS.equals(action)) {
+                if (success) {
+                    String json = intent.getStringExtra(TipoIntentService.EXTRA_RESULTADO);
+                    Type tipoLista = new TypeToken<List<Tipo>>() {}.getType();
+                    listaTipos = new Gson().fromJson(json, tipoLista);
+                    listaTipos.add(0, null); // Para opção "Tipos de Animais"
 
-            } catch (Exception e) {
-                e.printStackTrace();
+                    ArrayAdapter<Tipo> adapter = new ArrayAdapter<Tipo>(CadastrarAnimais.this,
+                            android.R.layout.simple_spinner_item, listaTipos) {
+                        @Override
+                        public View getView(int position, View convertView, ViewGroup parent) {
+                            TextView view = (TextView) super.getView(position, convertView, parent);
+                            if (getItem(position) == null) {
+                                view.setText("Tipos de Animais");
+                            } else {
+                                view.setText(getItem(position).getDescricao());
+                            }
+                            return view;
+                        }
+
+                        @Override
+                        public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                            TextView view = (TextView) super.getDropDownView(position, convertView, parent);
+                            if (getItem(position) == null) {
+                                view.setText("Tipos de Animais");
+                            } else {
+                                view.setText(getItem(position).getDescricao());
+                            }
+                            return view;
+                        }
+                    };
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    spinnerTipo.setAdapter(adapter);
+                    tiposCarregados = true;
+                    tryPreencherCampos();
+                } else {
+                    String error = intent.getStringExtra(TipoIntentService.EXTRA_ERROR);
+                    Toast.makeText(CadastrarAnimais.this, "Erro ao buscar tipos: " + error, Toast.LENGTH_LONG).show();
+                }
+            } else if (RacaIntentService.ACTION_BUSCAR_RACAS.equals(action)) {
+                if (success) {
+                    String json = intent.getStringExtra(RacaIntentService.EXTRA_RESULTADO);
+                    Type tipoLista = new TypeToken<List<Raca>>() {}.getType();
+                    listaRacas = new Gson().fromJson(json, tipoLista);
+                    listaRacas.add(0, null); // Para opção "Raças"
+
+                    ArrayAdapter<Raca> adapter = new ArrayAdapter<Raca>(CadastrarAnimais.this,
+                            android.R.layout.simple_spinner_item, listaRacas) {
+                        @Override
+                        public View getView(int position, View convertView, ViewGroup parent) {
+                            TextView view = (TextView) super.getView(position, convertView, parent);
+                            if (getItem(position) == null) {
+                                view.setText("Raças");
+                            } else {
+                                view.setText(getItem(position).getDescricao());
+                            }
+                            return view;
+                        }
+
+                        @Override
+                        public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                            TextView view = (TextView) super.getDropDownView(position, convertView, parent);
+                            if (getItem(position) == null) {
+                                view.setText("Raças");
+                            } else {
+                                view.setText(getItem(position).getDescricao());
+                            }
+                            return view;
+                        }
+                    };
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    spinnerRaca.setAdapter(adapter);
+                    racasCarregadas = true;
+                    tryPreencherCampos();
+                } else {
+                    String error = intent.getStringExtra(RacaIntentService.EXTRA_ERROR);
+                    Toast.makeText(CadastrarAnimais.this, "Erro ao buscar raças: " + error, Toast.LENGTH_LONG).show();
+                }
             }
-        }).start();
+        }
+    };
+
+    private void tryPreencherCampos() {
+        if (cidadesCarregadas && tiposCarregados && racasCarregadas) {
+            preencherCampos();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
     }
 }
