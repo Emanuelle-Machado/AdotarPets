@@ -118,7 +118,7 @@ public class AnimalIntentService extends IntentService {
                     Log.d("EDITAR", "PUT animal/" + id + " -> " + responseCode);
 
                     Intent broadcastIntent = new Intent(ACTION_EDITAR_ANIMAL);
-                    if (responseCode == 200) {
+                    if (responseCode > 200 && responseCode < 300) {
                         broadcastIntent.putExtra(EXTRA_SUCCESS, true);
                     } else {
                         String errorMessage = readErrorResponse(conn);

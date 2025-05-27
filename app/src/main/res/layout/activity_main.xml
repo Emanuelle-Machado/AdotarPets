@@ -23,9 +23,9 @@
         android:textSize="15sp" />
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -34,29 +34,29 @@
 
             <EditText
                 android:id="@+id/edIdadeDe"
-                android:hint="Idade de"
-                android:inputType="number"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
                 android:layout_weight="1"
-                android:layout_marginEnd="8dp"/>
+                android:hint="Idade de"
+                android:inputType="number" />
 
             <EditText
                 android:id="@+id/edIdadeAte"
-                android:hint="Idade até"
-                android:inputType="number"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
                 android:layout_weight="1"
-                android:layout_marginEnd="8dp"/>
+                android:hint="Idade até"
+                android:inputType="number" />
 
             <EditText
                 android:id="@+id/edDDD"
-                android:hint="DDD"
-                android:inputType="phone"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:hint="DDD"
+                android:inputType="phone" />
 
         </LinearLayout>
 
@@ -65,19 +65,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <Spinner
                 android:id="@+id/spFinalidade"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginEnd="8dp"/>
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1" />
 
             <Spinner
                 android:id="@+id/spCidade"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginEnd="8dp"/>
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1" />
         </LinearLayout>
 
         <LinearLayout
@@ -89,15 +90,15 @@
                 android:id="@+id/spRaca"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginEnd="8dp"/>
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1" />
 
             <Spinner
                 android:id="@+id/spTipo"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginEnd="8dp"/>
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1" />
 
         </LinearLayout>
 
@@ -109,10 +110,10 @@
 
             <Button
                 android:id="@+id/btnBuscar"
-                android:text="Buscar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"/>
+                android:layout_marginEnd="8dp"
+                android:text="Buscar" />
 
             <Button
                 android:id="@+id/btnLimpar"
@@ -125,22 +126,52 @@
     </LinearLayout>
 
     <ListView
+        android:id="@+id/lista_animais"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:id="@+id/lista_animais"/>
+        android:layout_weight="1" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="Cadastros"
+        android:textStyle="bold"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="end"
         android:orientation="horizontal"
-        android:gravity="end">
+        android:padding="8dp">
 
         <Button
+            android:id="@+id/btn_cadastrar_animais"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/btn_cadastrar_animais"
-            android:text="Cadastrar Animais" />
+            android:layout_marginEnd="8dp"
+            android:text="Animal" />
+
+        <Button
+            android:id="@+id/btn_cadastrar_cidades"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="Cidade" />
+
+        <Button
+            android:id="@+id/btn_cadastrar_tipos"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="Tipo" />
+
+        <Button
+            android:id="@+id/btn_cadastrar_racas"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Raça" />
 
 
     </LinearLayout>

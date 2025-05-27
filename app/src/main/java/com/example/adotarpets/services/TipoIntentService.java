@@ -3,15 +3,16 @@ package com.example.adotarpets.services;
 import android.app.IntentService;
 import android.content.Intent;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import com.example.adotarpets.models.Tipo;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.lang.reflect.Type;
 import java.util.List;
 
 public class TipoIntentService extends IntentService {
@@ -51,7 +52,9 @@ public class TipoIntentService extends IntentService {
             while ((linha = reader.readLine()) != null) {
                 json.append(linha);
             }
-            reader.close();
+
+            Type tipoLista = new TypeToken<List<Tipo>>() {}.getType();
+            List<Tipo> tipos = new Gson().fromJson(json.toString(), tipoLista);
 
             broadcast.putExtra(EXTRA_SUCCESS, true);
             broadcast.putExtra(EXTRA_RESULTADO, json.toString());
@@ -80,7 +83,7 @@ public class TipoIntentService extends IntentService {
             os.close();
 
             int responseCode = conn.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
+            if (responseCode > 200 && responseCode < 300) {
                 broadcast.putExtra(EXTRA_SUCCESS, true);
             } else {
                 broadcast.putExtra(EXTRA_SUCCESS, false);

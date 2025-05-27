@@ -18,13 +18,13 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".telas.CadastrarTipos"
+            android:name=".telas.DialogCadastrarTipo"
             android:exported="false" />
         <activity
             android:name=".telas.CadastrarRacas"
             android:exported="false" />
         <activity
-            android:name=".telas.CadastrarCidades"
+            android:name=".telas.DialogCadastrarCidade"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

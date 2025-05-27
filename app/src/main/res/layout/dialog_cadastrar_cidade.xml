@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="350dp"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/ed_nome_cidade"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nome da Cidade" />
+
+        <EditText
+            android:id="@+id/ed_ddd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="DDD"
+            android:inputType="number" />
+
+    </LinearLayout>
+
+</LinearLayout>
