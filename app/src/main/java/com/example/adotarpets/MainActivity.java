@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
             txtCidade.setText("Cidade: " + (animal.getCidade() != null && animal.getCidade().getNome() != null ? animal.getCidade().getNome() : "N/A"));
             txtProprietario.setText("Proprietário: " + (animal.getNomeProprietario() != null ? animal.getNomeProprietario() : "N/A"));
             txtContato.setText("Contato: " + (animal.getContato() != null ? animal.getContato() : "N/A"));
-            txtFinalidade.setText("Finalidade: " + (animal.getFinalidade().equals("D") ? "Doação" : "Adoção"));
+            txtFinalidade.setText("Finalidade: " + (animal.getFinalidade() != null ? (animal.getFinalidade().equals("D") ? "Doação" : "Adoção") : "N/A"));
             txtValor.setText("Valor: R$ " + animal.getValor());
 
             return convertView;
@@ -374,19 +374,27 @@ public class MainActivity extends AppCompatActivity {
                     String error = intent.getStringExtra(AnimalIntentService.EXTRA_ERROR);
                     Toast.makeText(MainActivity.this, "Erro ao buscar animais: " + error, Toast.LENGTH_LONG).show();
                 }
-            } else if (AnimalIntentService.ACTION_CADASTRAR_ANIMAL.equals(action) ||
-                    AnimalIntentService.ACTION_EDITAR_ANIMAL.equals(action)) {
+            } else if (AnimalIntentService.ACTION_BUSCAR_ANIMAIS.equals(action)) {
                 boolean success = intent.getBooleanExtra(AnimalIntentService.EXTRA_SUCCESS, false);
                 if (success) {
-                    Intent refreshIntent = new Intent(MainActivity.this, AnimalIntentService.class);
-                    refreshIntent.setAction(AnimalIntentService.ACTION_BUSCAR_ANIMAIS);
-                    refreshIntent.putExtra("url", "http://argo.td.utfpr.edu.br/pets/ws/animal");
-                    startService(refreshIntent);
+                    String json = intent.getStringExtra(AnimalIntentService.EXTRA_RESULTADO);
+                    Type tipoLista = new TypeToken<List<Animal>>() {}.getType();
+                    List<Animal> tempAnimais = new Gson().fromJson(json, tipoLista);
+                    animais.clear();
+                    for (Animal animal : tempAnimais) {
+                        if (animal.getFinalidade() == null) {
+                            Log.w("AnimalList", "Animal com finalidade nula: " + animal.getDescricao());
+                            continue; // Skip animals with null finalidade
+                        }
+                        animais.add(animal);
+                    }
+                    adapter = new AnimalAdapter(MainActivity.this, animais);
+                    listaAnimais.setAdapter(adapter);
                 } else {
                     String error = intent.getStringExtra(AnimalIntentService.EXTRA_ERROR);
-                    Toast.makeText(MainActivity.this, "Erro: " + error, Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, "Erro ao buscar animais: " + error, Toast.LENGTH_LONG).show();
                 }
-            } else if (CidadeIntentService.ACTION_BUSCAR_CIDADES.equals(action)) {
+            }else if (CidadeIntentService.ACTION_BUSCAR_CIDADES.equals(action)) {
                 boolean success = intent.getBooleanExtra(CidadeIntentService.EXTRA_SUCCESS, false);
                 if (success) {
                     String json = intent.getStringExtra(CidadeIntentService.EXTRA_RESULTADO);

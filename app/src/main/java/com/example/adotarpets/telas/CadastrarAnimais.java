@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -302,42 +303,59 @@ public class CadastrarAnimais extends AppCompatActivity {
 
     private void preencherCampos() {
         if (animalParaEditar != null) {
-            editDescricao.setText(animalParaEditar.getDescricao());
-            editIdade.setText(String.valueOf(animalParaEditar.getIdade()));
+            // Set text fields with null checks
+            editDescricao.setText(animalParaEditar.getDescricao() != null ? animalParaEditar.getDescricao() : "");
+            editIdade.setText(animalParaEditar.getIdade() > 0 ? String.valueOf(animalParaEditar.getIdade()) : "");
             editValor.setText(animalParaEditar.getValor() > 0 ? String.valueOf(animalParaEditar.getValor()) : "");
-            editCor.setText(animalParaEditar.getCor());
-            editProprietario.setText(animalParaEditar.getNomeProprietario());
-            editContato.setText(animalParaEditar.getContato());
+            editCor.setText(animalParaEditar.getCor() != null ? animalParaEditar.getCor() : "");
+            editProprietario.setText(animalParaEditar.getNomeProprietario() != null ? animalParaEditar.getNomeProprietario() : "");
+            editContato.setText(animalParaEditar.getContato() != null ? animalParaEditar.getContato() : "");
 
-            // Set finalidade
-            spinnerFinalidade.setSelection(animalParaEditar.getFinalidade().equals("A") ? 1 : 2);
+            // Set finalidade with null check
+            if (animalParaEditar.getFinalidade() != null) {
+                spinnerFinalidade.setSelection(animalParaEditar.getFinalidade().equals("A") ? 1 : 2);
+            } else {
+                spinnerFinalidade.setSelection(0); // Default to "Finalidade"
+                Log.w("CadastrarAnimais", "Animal ID " + animalParaEditar.getId() + " tem finalidade nula");
+            }
 
-            // Set spinners after data is loaded
-            if (!listaTipos.isEmpty()) {
+            // Set tipo spinner with null checks
+            if (!listaTipos.isEmpty() && animalParaEditar.getRaca() != null && animalParaEditar.getRaca().getTipo() != null) {
                 for (int i = 0; i < listaTipos.size(); i++) {
-                    if (listaTipos.get(i) != null
-                            && listaTipos.get(i).getId() == animalParaEditar.getRaca().getTipo().getId()) {
+                    if (listaTipos.get(i) != null && listaTipos.get(i).getId() == animalParaEditar.getRaca().getTipo().getId()) {
                         spinnerTipo.setSelection(i);
                         break;
                     }
                 }
+            } else {
+                spinnerTipo.setSelection(0); // Default to "Tipos de Animais"
+                Log.w("CadastrarAnimais", "Animal ID " + animalParaEditar.getId() + " tem raca ou tipo nulo");
             }
-            if (!listaRacas.isEmpty()) {
+
+            // Set raca spinner with null check
+            if (!listaRacas.isEmpty() && animalParaEditar.getRaca() != null) {
                 for (int i = 0; i < listaRacas.size(); i++) {
                     if (listaRacas.get(i) != null && listaRacas.get(i).getId() == animalParaEditar.getRaca().getId()) {
                         spinnerRaca.setSelection(i);
                         break;
                     }
                 }
+            } else {
+                spinnerRaca.setSelection(0); // Default to "Raças"
+                Log.w("CadastrarAnimais", "Animal ID " + animalParaEditar.getId() + " tem raca nula");
             }
-            if (!listaCidades.isEmpty()) {
+
+            // Set cidade spinner with null check
+            if (!listaCidades.isEmpty() && animalParaEditar.getCidade() != null) {
                 for (int i = 0; i < listaCidades.size(); i++) {
-                    if (listaCidades.get(i) != null
-                            && listaCidades.get(i).getId() == animalParaEditar.getCidade().getId()) {
+                    if (listaCidades.get(i) != null && listaCidades.get(i).getId() == animalParaEditar.getCidade().getId()) {
                         spinnerCidade.setSelection(i);
                         break;
                     }
                 }
+            } else {
+                spinnerCidade.setSelection(0); // Default to "Cidades"
+                Log.w("CadastrarAnimais", "Animal ID " + animalParaEditar.getId() + " tem cidade nula");
             }
         }
     }
