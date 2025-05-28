@@ -216,6 +216,22 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra("animal", selecionado);
             startActivityForResult(intent, 100);
         });
+
+        listaAnimais.setOnItemLongClickListener((parent, view, position, id) -> {
+            Animal animal = animais.get(position);
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("Confirmar Deleção")
+                    .setMessage("Deseja deletar o animal: " + (animal.getDescricao() != null ? animal.getDescricao() : "Sem descrição") + "?")
+                    .setPositiveButton("Sim", (dialog, which) -> {
+                        Intent intent = new Intent(MainActivity.this, AnimalIntentService.class);
+                        intent.setAction(AnimalIntentService.ACTION_DELETAR_ANIMAL);
+                        intent.putExtra("id", animal.getId());
+                        startService(intent);
+                    })
+                    .setNegativeButton("Não", null)
+                    .show();
+            return true;
+        });
     }
 
     private void mostrarDialogCadastrarCidade() {
@@ -394,7 +410,23 @@ public class MainActivity extends AppCompatActivity {
                     String error = intent.getStringExtra(AnimalIntentService.EXTRA_ERROR);
                     Toast.makeText(MainActivity.this, "Erro ao buscar animais: " + error, Toast.LENGTH_LONG).show();
                 }
-            }else if (CidadeIntentService.ACTION_BUSCAR_CIDADES.equals(action)) {
+            } else if (AnimalIntentService.ACTION_DELETAR_ANIMAL.equals(action)) {
+                boolean success = intent.getBooleanExtra(AnimalIntentService.EXTRA_SUCCESS, false);
+                if (success) {
+                    int animalId = intent.getIntExtra("id", -1);
+                    for (int i = 0; i < animais.size(); i++) {
+                        if (animais.get(i).getId() == animalId) {
+                            animais.remove(i);
+                            break;
+                        }
+                    }
+                    adapter.notifyDataSetChanged();
+                    Toast.makeText(MainActivity.this, "Animal deletado com sucesso!", Toast.LENGTH_SHORT).show();
+                } else {
+                    String error = intent.getStringExtra(AnimalIntentService.EXTRA_ERROR);
+                    Toast.makeText(MainActivity.this, "Erro ao deletar animal: " + error, Toast.LENGTH_LONG).show();
+                }
+            } else if (CidadeIntentService.ACTION_BUSCAR_CIDADES.equals(action)) {
                 boolean success = intent.getBooleanExtra(CidadeIntentService.EXTRA_SUCCESS, false);
                 if (success) {
                     String json = intent.getStringExtra(CidadeIntentService.EXTRA_RESULTADO);
@@ -546,6 +578,7 @@ public class MainActivity extends AppCompatActivity {
         filter.addAction(AnimalIntentService.ACTION_BUSCAR_ANIMAIS);
         filter.addAction(AnimalIntentService.ACTION_CADASTRAR_ANIMAL);
         filter.addAction(AnimalIntentService.ACTION_EDITAR_ANIMAL);
+        filter.addAction(AnimalIntentService.ACTION_DELETAR_ANIMAL);
         filter.addAction(CidadeIntentService.ACTION_BUSCAR_CIDADES);
         filter.addAction(CidadeIntentService.ACTION_CADASTRAR_CIDADE);
         filter.addAction(TipoIntentService.ACTION_BUSCAR_TIPOS);

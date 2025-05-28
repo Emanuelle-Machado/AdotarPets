@@ -7,6 +7,7 @@ import android.util.Log;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -17,6 +18,7 @@ public class AnimalIntentService extends IntentService {
     public static final String ACTION_BUSCAR_ANIMAIS = "BUSCAR_ANIMAIS";
     public static final String ACTION_CADASTRAR_ANIMAL = "CADASTRAR_ANIMAL";
     public static final String ACTION_EDITAR_ANIMAL = "EDITAR_ANIMAL";
+    public static final String ACTION_DELETAR_ANIMAL = "DELETAR_ANIMAL";
     public static final String EXTRA_RESULTADO = "resultado";
     public static final String EXTRA_SUCCESS = "success";
     public static final String EXTRA_ERROR = "error";
@@ -135,6 +137,41 @@ public class AnimalIntentService extends IntentService {
                     broadcastIntent.putExtra(EXTRA_ERROR, e.getMessage());
                     LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
                 }
+            } else if (ACTION_DELETAR_ANIMAL.equals(intent.getAction())) {
+                int id = intent.getIntExtra("id", -1);
+                Intent broadcastIntent = new Intent(ACTION_DELETAR_ANIMAL);
+                try {
+                    if (id == -1) {
+                        throw new IllegalArgumentException("ID do animal inválido");
+                    }
+
+                    URL url = new URL("http://argo.td.utfpr.edu.br/pets/ws/animal/" + id);
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("DELETE");
+                    conn.setConnectTimeout(5000);
+                    conn.setReadTimeout(5000);
+
+                    int responseCode = conn.getResponseCode();
+                    if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_NO_CONTENT) {
+                        broadcastIntent.putExtra(EXTRA_SUCCESS, true);
+                        broadcastIntent.putExtra("id", id);
+                    } else {
+                        String errorMessage = "Erro ao deletar animal: HTTP " + responseCode;
+                        broadcastIntent.putExtra(EXTRA_SUCCESS, false);
+                        broadcastIntent.putExtra(EXTRA_ERROR, errorMessage);
+                        Log.e("AnimalIntentService", errorMessage);
+                    }
+                    conn.disconnect();
+                } catch (IOException e) {
+                    broadcastIntent.putExtra(EXTRA_SUCCESS, false);
+                    broadcastIntent.putExtra(EXTRA_ERROR, "Erro de conexão: " + e.getMessage());
+                    Log.e("AnimalIntentService", "IOException ao deletar animal", e);
+                } catch (Exception e) {
+                    broadcastIntent.putExtra(EXTRA_SUCCESS, false);
+                    broadcastIntent.putExtra(EXTRA_ERROR, "Erro: " + e.getMessage());
+                    Log.e("AnimalIntentService", "Erro ao deletar animal", e);
+                }
+                LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
             }
         }
     }
