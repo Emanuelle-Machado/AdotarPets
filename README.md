@@ -30,6 +30,7 @@ O principal objetivo é possibilitar o usuário de ver animais para adoção e c
 
 
 ## 📑 Endpoints da API
+urlBase: https://argo.td.utfpr.edu.br
 
 | Método | Endpoint                                              | Descrição                                                                 |
 |--------|--------------------------------------------------------|---------------------------------------------------------------------------|
