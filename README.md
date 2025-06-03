@@ -29,28 +29,18 @@ O principal objetivo é possibilitar o usuário de ver animais para adoção e c
 **Back-end:** Node, Laravel, PHP
 
 
-## Documentação da API
+## 📑 Endpoints da API
 
-#### Retorna todos os animais
-
-```http
-  GET https://argo.td.utfpr.edu.br/pets/ws/animal
-```
-
-| Parâmetro   | Tipo       | Descrição                           |
-| :---------- | :--------- | :---------------------------------- |
-| `api_key` | `string` | **Obrigatório**. A chave da sua API |
-
-#### Retorna um animal
-
-```http
-  GET https://argo.td.utfpr.edu.br/pets/ws/animal/${id}
-```
-
-| Parâmetro   | Tipo       | Descrição                                   |
-| :---------- | :--------- | :------------------------------------------ |
-| `id`      | `string` | **Obrigatório**. O ID do item que você quer |
-
+| Método | Endpoint                                              | Descrição                                                                 |
+|--------|--------------------------------------------------------|---------------------------------------------------------------------------|
+| GET    | `/pets/ws/animal`                                     | Retorna todos os animais                                                 |
+| GET    | `/pets/ws/tipo`                                       | Retorna todos os tipos de animais                                        |
+| GET    | `/pets/ws/raca`                                       | Retorna todas as raças                                                   |
+| GET    | `/pets/ws/cidade`                                     | Retorna todas as cidades                                                 |
+| GET    | `/pets/ws/animal/{id}`                                | Retorna um animal específico pelo ID                                     |
+| GET    | `/pets/ws/tipo/{id}`                                  | Retorna um tipo específico pelo ID                                       |
+| GET    | `/pets/ws/raca/{id}`                                  | Retorna uma raça específica pelo ID                                      |
+| GET    | `/pets/ws/cidade/{id}`                                | Retorna uma cidade específica pelo ID                                    |
 
 ## Melhorias
 
