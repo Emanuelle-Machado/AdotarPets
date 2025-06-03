@@ -30,18 +30,18 @@ O principal objetivo é possibilitar o usuário de ver animais para adoção e c
 
 
 ## 📑 Endpoints da API
-urlBase: https://argo.td.utfpr.edu.br
+urlBase: https://argo.td.utfpr.edu.br/pets/ws/
 
-| Método | Endpoint                                              | Descrição                                                                 |
-|--------|--------------------------------------------------------|---------------------------------------------------------------------------|
-| GET    | `/pets/ws/animal`                                     | Retorna todos os animais                                                 |
-| GET    | `/pets/ws/tipo`                                       | Retorna todos os tipos de animais                                        |
-| GET    | `/pets/ws/raca`                                       | Retorna todas as raças                                                   |
-| GET    | `/pets/ws/cidade`                                     | Retorna todas as cidades                                                 |
-| GET    | `/pets/ws/animal/{id}`                                | Retorna um animal específico pelo ID                                     |
-| GET    | `/pets/ws/tipo/{id}`                                  | Retorna um tipo específico pelo ID                                       |
-| GET    | `/pets/ws/raca/{id}`                                  | Retorna uma raça específica pelo ID                                      |
-| GET    | `/pets/ws/cidade/{id}`                                | Retorna uma cidade específica pelo ID                                    |
+| Método | Endpoint                                     | Descrição                                                                |
+|--------|----------------------------------------------|--------------------------------------------------------------------------|
+| GET    | `animal`                                     | Retorna todos os animais                                                 |
+| GET    | `tipo`                                       | Retorna todos os tipos de animais                                        |
+| GET    | `raca`                                       | Retorna todas as raças                                                   |
+| GET    | `cidade`                                     | Retorna todas as cidades                                                 |
+| GET    | `animal/{id}`                                | Retorna um animal específico pelo ID                                     |
+| GET    | `tipo/{id}`                                  | Retorna um tipo específico pelo ID                                       |
+| GET    | `raca/{id}`                                  | Retorna uma raça específica pelo ID                                      |
+| GET    | `cidade/{id}`                                | Retorna uma cidade específica pelo ID                                    |
 
 ## Melhorias
 
