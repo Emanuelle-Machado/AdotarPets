@@ -64,9 +64,23 @@ Neste projeto aprendi mais sobre o uso de services em aplicativos mobile para me
 
 ## Screenshots
 
+### Página inicial
 <p align="center">
   <img src="https://github.com/Emanuelle-Machado/AdotarPets/blob/master/app/src/main/assets/imglimpa.jpeg" alt="Página inicial" width="200"/>
   <img src="https://github.com/Emanuelle-Machado/AdotarPets/blob/master/app/src/main/assets/imgpreenchida.jpeg" alt="Listagem de animais" width="200"/>
+  
+</p>
+
+### Cadastros
+<p align="center">
   <img src="https://github.com/Emanuelle-Machado/AdotarPets/blob/master/app/src/main/assets/animais.jpeg" alt="Cadastro de Animais" width="200"/>
+  <img src="https://github.com/Emanuelle-Machado/AdotarPets/blob/master/app/src/main/assets/cidade.jpeg" alt="Dialogo de cadastro de cidade" width="200"/>
+  <img src="https://github.com/Emanuelle-Machado/AdotarPets/blob/master/app/src/main/assets/raca.jpeg" alt="Dialogo de cadastro de raças" width="200"/>
+  <img src="https://github.com/Emanuelle-Machado/AdotarPets/blob/master/app/src/main/assets/tipo.jpeg" alt="Dialogo de cadastro de tipos" width="200"/>
+</p>
+
+### Todas as telas tem sua versão horizontal
+<p align="center">
+  <img src="https://github.com/Emanuelle-Machado/AdotarPets/blob/master/app/src/main/assets/horizontal.jpeg" alt="Imagem na horizontal" width="200"/>
 </p>
 
