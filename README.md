@@ -64,5 +64,9 @@ Neste projeto aprendi mais sobre o uso de services em aplicativos mobile para me
 
 ## Screenshots
 
-![](https://github.com/Emanuelle-Machado/AdotarPets/blob/master/app/src/main/assets/animais.jpeg)
+<p align="center">
+  <img src="https://github.com/Emanuelle-Machado/AdotarPets/blob/master/app/src/main/assets/imglimpa.jpeg" alt="Página inicial" width="200"/>
+  <img src="https://github.com/Emanuelle-Machado/AdotarPets/blob/master/app/src/main/assets/imgpreenchida.jpeg" alt="Listagem de animais" width="200"/>
+  <img src="https://github.com/Emanuelle-Machado/AdotarPets/blob/master/app/src/main/assets/animais.jpeg" alt="Cadastro de Animais" width="200"/>
+</p>
 
