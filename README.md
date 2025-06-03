@@ -31,29 +31,25 @@ O principal objetivo é possibilitar o usuário de ver animais para adoção e c
 
 ## Documentação da API
 
-#### Retorna todos os itens
+#### Retorna todos os animais
 
 ```http
-  GET /api/items
+  GET https://argo.td.utfpr.edu.br/pets/ws/animal
 ```
 
 | Parâmetro   | Tipo       | Descrição                           |
 | :---------- | :--------- | :---------------------------------- |
 | `api_key` | `string` | **Obrigatório**. A chave da sua API |
 
-#### Retorna um item
+#### Retorna um animal
 
 ```http
-  GET /api/items/${id}
+  GET https://argo.td.utfpr.edu.br/pets/ws/animal/${id}
 ```
 
 | Parâmetro   | Tipo       | Descrição                                   |
 | :---------- | :--------- | :------------------------------------------ |
 | `id`      | `string` | **Obrigatório**. O ID do item que você quer |
-
-#### add(num1, num2)
-
-Recebe dois números e retorna a sua soma.
 
 
 ## Melhorias
