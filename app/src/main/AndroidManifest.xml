@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -16,10 +17,15 @@
         android:theme="@style/Theme.AdotarPets"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
-        <service
-            android:name=".services.AnimalIntentService"
-            android:exported="false"></service>
-
+        <activity
+            android:name=".telas.DialogCadastrarTipo"
+            android:exported="false" />
+        <activity
+            android:name=".telas.CadastrarRacas"
+            android:exported="false" />
+        <activity
+            android:name=".telas.DialogCadastrarCidade"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -29,6 +35,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".telas.CadastrarAnimais"
+            android:exported="false" />
+
+        <service
+            android:name=".services.TipoIntentService"
+            android:exported="false" />
+        <service
+            android:name=".services.RacaIntentService"
+            android:exported="false" />
+        <service
+            android:name=".services.CidadeIntentService"
+            android:exported="false" />
+        <service
+            android:name=".services.AnimalIntentService"
+            android:exported="false" />
     </application>
 
 </manifest>

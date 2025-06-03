@@ -26,10 +26,16 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/txtRacaTipo"
+                android:id="@+id/txtTipo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Raça/Tipo" />
+                android:text="Tipo" />
+
+            <TextView
+                android:id="@+id/txtRaca"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Raça" />
 
             <TextView
                 android:id="@+id/txtCor"
@@ -79,6 +85,13 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:text="Cidade" />
+
+            <TextView
+                android:id="@+id/txtValor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:text="Valor" />
 
         </LinearLayout>
 
