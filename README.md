@@ -81,6 +81,6 @@ Neste projeto aprendi mais sobre o uso de services em aplicativos mobile para me
 
 ### Todas as telas tem sua versão horizontal
 <p align="center">
-  <img src="https://github.com/Emanuelle-Machado/AdotarPets/blob/master/app/src/main/assets/horizontal.jpeg" alt="Imagem na horizontal" width="200"/>
+  <img src="https://github.com/Emanuelle-Machado/AdotarPets/blob/master/app/src/main/assets/horizontal.jpeg" alt="Imagem na horizontal" height="200"/>
 </p>
 
