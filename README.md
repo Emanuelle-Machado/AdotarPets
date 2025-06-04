@@ -24,9 +24,9 @@ O principal objetivo é possibilitar o usuário de ver animais para adoção e c
 
 ## Stack utilizada
 
-**Front-end:** PHP, TailwindCSS, Blade
+**Front-end:** Xml
 
-**Back-end:** Node, Laravel, PHP
+**Back-end:** Java
 
 
 ## 📑 Endpoints da API
