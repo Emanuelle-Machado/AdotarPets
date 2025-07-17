@@ -38,10 +38,26 @@ urlBase: https://argo.td.utfpr.edu.br/pets/ws/
 | GET    | `tipo`                                       | Retorna todos os tipos de animais                                        |
 | GET    | `raca`                                       | Retorna todas as raças                                                   |
 | GET    | `cidade`                                     | Retorna todas as cidades                                                 |
+|        |                                              |                                                                          |
 | GET    | `animal/{id}`                                | Retorna um animal específico pelo ID                                     |
 | GET    | `tipo/{id}`                                  | Retorna um tipo específico pelo ID                                       |
 | GET    | `raca/{id}`                                  | Retorna uma raça específica pelo ID                                      |
 | GET    | `cidade/{id}`                                | Retorna uma cidade específica pelo ID                                    |
+|        |                                              |                                                                          |
+| POST   | `animal`                                     | Cadastra um animal                                                       |
+| POST   | `tipo`                                       | Cadastra um tipo                                                         |
+| POST   | `raca`                                       | Cadastra uma raça                                                        |
+| POST   | `cidade`                                     | Cadastra uma cidade                                                      |
+|        |                                              |                                                                          |
+| PUT    | `animal/{id}`                                | Altera um animal específico pelo ID                                      |
+| PUT    | `tipo/{id}`                                  | Altera um tipo específico pelo ID                                        |
+| PUT    | `raca/{id}`                                  | Altera uma raça específica pelo ID                                       |
+| PUT    | `cidade/{id}`                                | Altera uma cidade específica pelo ID                                     |
+|        |                                              |                                                                          |
+| DELETE | `animal/{id}`                                | Deleta um animal específico pelo ID                                      |
+| DELETE | `tipo/{id}`                                  | Deleta um tipo específico pelo ID                                        |
+| DELETE | `raca/{id}`                                  | Deleta uma raça específica pelo ID                                       |
+| DELETE | `cidade/{id}`                                | Deleta uma cidade específica pelo ID                                     |
 
 ## Melhorias
 
